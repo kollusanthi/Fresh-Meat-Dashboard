@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+    <h2 class="fw-bold mb-4 text-brand-green"><i class="fas fa-box-open text-brand-orange me-2"></i>My Orders &amp; Live Tracking</h2>
+
+    {% if orders|length == 0 %}
+    <div class="text-center py-5 card-themed">
+        <i class="fas fa-receipt fa-4x text-brand-muted mb-3"></i>
+        <h4>You haven't placed any orders yet.</h4>
+        <a href="{{ url_for('products') }}" class="btn btn-brand mt-2">Order Fresh Meat Now</a>
+    </div>
+    {% else %}
+    <div class="row g-4">
+        {% for o in orders %}
+        <div class="col-12">
+            <div class="card-themed overflow-hidden">
+                <div class="bg-white py-3 px-4 d-flex flex-wrap justify-content-between align-items-center gap-2" style="border-bottom: 1px solid var(--border);">
+                    <div>
+                        <span class="fw-bold text-brand-green fs-5">Order #{{ o['order_code'] }}</span>
+                        <span class="text-brand-muted small ms-2">Placed on {{ o['order_date'] }}</span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <span class="badge {% if 'Paid' in o['payment_status'] %}bg-brand-green text-white{% elif 'Cancelled' in o['payment_status'] or 'Refund' in o['payment_status'] or 'Return' in o['payment_status'] %}bg-secondary{% else %}bg-brand-orange text-white{% endif %} px-3 py-2">
+                            Payment: {{ o['payment_status'] }}
+                        </span>
+                        <span class="badge {% if o['delivery_status'] == 'Cancelled' %}bg-danger{% elif 'Return' in o['delivery_status'] %}bg-warning text-dark{% else %}bg-brand-dark text-white{% endif %} px-3 py-2">
+                            Status: {{ o['delivery_status'] }}
+                        </span>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Ordered Products:</strong> {{ o['items_summary'] }}</p>
+                            <p class="mb-1"><strong>Total Weight / Qty:</strong> {{ o['total_quantity'] }} kg</p>
+                            <p class="mb-1 small text-brand-muted"><strong>Delivery Address:</strong> {{ o['delivery_address'] }}</p>
+                            <p class="mb-1 small text-brand-muted"><strong>Delivery Slot:</strong> {{ o['delivery_slot'] }}</p>
+                            {% if o['action_reason'] %}
+                            <div class="mt-2 px-3 py-2 rounded small" style="background: #fff5f5; border-left: 3px solid #dc3545; color: #7a1c1c;">
+                                <strong><i class="fas fa-comment-alt me-1"></i>{{ 'Return' if 'Return' in o['delivery_status'] else 'Cancellation' }} Reason:</strong> {{ o['action_reason'] }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <div class="small text-brand-muted">Total Amount</div>
+                            <div class="fs-4 fw-bold text-brand-green">₹{{ o['total_amount'] }}</div>
+                            <div class="small text-brand-muted">{{ o['payment_method'] }}</div>
+                        </div>
+                        <div class="col-md-3 text-md-end">
+                            {% if o['delivery_status'] not in ['Delivered', 'Cancelled', 'Return Requested', 'Returned'] %}
+                            <button type="button" class="btn btn-outline-danger btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#cancelModal{{ o['id'] }}">
+                                <i class="fas fa-times-circle me-1"></i> Cancel Order
+                            </button>
+                            {% elif o['delivery_status'] == 'Delivered' %}
+                            <button type="button" class="btn btn-outline-warning text-dark btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#returnModal{{ o['id'] }}">
+                                <i class="fas fa-undo-alt me-1"></i> Return Order
+                            </button>
+                            {% else %}
+                            <span class="text-brand-muted small fst-italic">No actions available</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if o['delivery_status'] not in ['Cancelled', 'Return Requested', 'Returned'] %}
+                    <div class="mt-4 pt-3" style="border-top: 1px solid var(--border);">
+                        <div class="progress" style="height: 8px; background: var(--cream);">
+                            <div class="progress-bar bg-brand-green" role="progressbar" style="width: {% if o['delivery_status'] == 'Delivered' %}100%{% else %}45%{% endif %};"></div>
+                        </div>
+                        <div class="d-flex justify-content-between small fw-semibold mt-2 text-brand-muted">
+                            <span class="text-brand-green"><i class="fas fa-check-circle"></i> Order Confirmed</span>
+                            <span class="text-brand-green"><i class="fas fa-cut"></i> Hygienically Cut &amp; Packed</span>
+                            <span class="{% if o['delivery_status'] == 'Delivered' %}text-brand-green{% endif %}"><i class="fas fa-motorcycle"></i> Out for Cold Delivery</span>
+                            <span class="{% if o['delivery_status'] == 'Delivered' %}text-brand-green{% endif %}"><i class="fas fa-home"></i> Delivered</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Cancel Order Reason Modal -->
+        <div class="modal fade" id="cancelModal{{ o['id'] }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                    <form action="{{ url_for('cancel_order', order_id=o['id']) }}" method="POST">
+                        <div class="modal-header bg-danger text-white border-0">
+                            <h5 class="modal-title fw-bold"><i class="fas fa-times-circle me-2"></i>Cancel Order #{{ o['order_code'] }}</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <p class="small text-brand-muted mb-3">Please tell us why you want to cancel this order so we can improve our service:</p>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Select Cancellation Reason <span class="text-danger">*</span></label>
+                                <select name="reason_choice" class="form-select" required>
+                                    <option value="" selected disabled>-- Choose a reason --</option>
+                                    <option value="Ordered by mistake">Ordered by mistake</option>
+                                    <option value="Need to change delivery slot or address">Need to change delivery slot or address</option>
+                                    <option value="Want to modify items or weight">Want to modify items or weight</option>
+                                    <option value="Delivery taking longer than expected">Delivery taking longer than expected</option>
+                                    <option value="Other">Other (Specify below)</option>
+                                </select>
+                            </div>
+                            <div class="mb-0">
+                                <label class="form-label fw-semibold">Additional Details / Comments</label>
+                                <textarea name="custom_reason" class="form-control" rows="2" placeholder="Write specific details (required if 'Other' is selected)..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                            <button type="button" class="btn btn-light fw-semibold" data-bs-dismiss="modal">Keep Order</button>
+                            <button type="submit" class="btn btn-danger fw-bold px-4">Confirm Cancellation</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Return Order Reason Modal -->
+        <div class="modal fade" id="returnModal{{ o['id'] }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                    <form action="{{ url_for('return_order', order_id=o['id']) }}" method="POST">
+                        <div class="modal-header bg-brand-orange text-white border-0">
+                            <h5 class="modal-title fw-bold"><i class="fas fa-undo-alt me-2"></i>Return Order #{{ o['order_code'] }}</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <p class="small text-brand-muted mb-3">Our cold-chain quality guarantee covers freshness, cut accuracy, and packaging integrity.</p>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Select Return Reason <span class="text-danger">*</span></label>
+                                <select name="reason_choice" class="form-select" required>
+                                    <option value="" selected disabled>-- Choose a reason --</option>
+                                    <option value="Freshness or temperature concern">Freshness or temperature concern</option>
+                                    <option value="Wrong cut or incorrect item delivered">Wrong cut or incorrect item delivered</option>
+                                    <option value="Weight mismatch / missing quantity">Weight mismatch / missing quantity</option>
+                                    <option value="Damaged or leaking vacuum pack">Damaged or leaking vacuum pack</option>
+                                    <option value="Other">Other (Specify below)</option>
+                                </select>
+                            </div>
+                            <div class="mb-0">
+                                <label class="form-label fw-semibold">Describe the Issue</label>
+                                <textarea name="custom_reason" class="form-control" rows="2" placeholder="Describe the issue for priority pickup & refund..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                            <button type="button" class="btn btn-light fw-semibold" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-accent fw-bold px-4">Submit Return Request</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

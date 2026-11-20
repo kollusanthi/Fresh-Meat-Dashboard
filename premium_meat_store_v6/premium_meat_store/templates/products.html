@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h2 class="fw-bold mb-0 text-brand-green">
+                {% if search_query %}
+                    Search Results for "{{ search_query }}"
+                {% else %}
+                    {{ active_category }} Fresh Cuts
+                {% endif %}
+            </h2>
+            <p class="text-brand-muted mb-0">Page {{ page }} of {{ total_pages }} ({{ total_items }} total items) &bull; Click any item for full-screen details</p>
+        </div>
+
+        <!-- Category Filter Pills -->
+        <div class="btn-group flex-wrap" role="group">
+            {% for cat in ['All', 'Chicken', 'Mutton', 'Fish', 'Seafood'] %}
+            <a href="{{ url_for('products', category=cat, page=1) }}"
+               class="btn {% if active_category == cat and not search_query %}btn-brand{% else %}btn-outline-brand{% endif %}">
+                {{ cat }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if products|length == 0 %}
+    <div class="text-center py-5 card-themed">
+        <i class="fas fa-search fa-3x text-brand-muted mb-3"></i>
+        <h4>No matching meat products found.</h4>
+        <a href="{{ url_for('products') }}" class="btn btn-brand mt-2">View All Products</a>
+    </div>
+    {% else %}
+    <div class="row g-4">
+        {% for item in products %}
+        {% set final_price = get_discounted_price(item) %}
+        <div class="col-sm-6 col-md-4">
+            <div class="card product-card">
+                <div class="product-img-wrap" style="height: 220px;">
+                    <a href="{{ url_for('product_detail', product_id=item['id']) }}">
+                        <img src="{{ item['image_url'] }}" alt="{{ item['name'] }}" class="{% if item['in_stock'] == 0 %}oos-img{% endif %}">
+                    </a>
+                    {% if item['discount_percent'] > 0 %}
+                    <span class="badge-discount">{{ item['discount_percent'] }}% OFF</span>
+                    {% endif %}
+                    <form action="{{ url_for('toggle_wishlist', product_id=item['id']) }}" method="POST" class="js-wishlist-form">
+                        <button type="submit" class="btn-wishlist" title="Save to Wishlist">
+                            {% if item['id'] in wishlist_ids %}
+                            <i class="fas fa-heart text-brand-orange"></i>
+                            {% else %}
+                            <i class="far fa-heart text-brand-green"></i>
+                            {% endif %}
+                        </button>
+                    </form>
+                    {% if item['in_stock'] == 0 %}
+                    <span class="badge-oos">OUT OF STOCK</span>
+                    {% endif %}
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge" style="background: var(--cream); color: var(--green); border: 1px solid var(--border);">{{ item['category'] }}</span>
+                        {% if item['in_stock'] == 1 %}
+                        <span class="small fw-bold text-brand-green"><i class="fas fa-check-circle"></i> Available</span>
+                        {% else %}
+                        <span class="small fw-bold text-brand-orange"><i class="fas fa-times-circle"></i> Out of Stock</span>
+                        {% endif %}
+                    </div>
+                    <h5 class="fw-bold">
+                        <a href="{{ url_for('product_detail', product_id=item['id']) }}" class="text-decoration-none" style="color: var(--text);">
+                            {{ item['name'] }}
+                        </a>
+                    </h5>
+                    <p class="small text-brand-muted flex-grow-1">{{ item['description'] }}</p>
+
+                    <div class="pt-3 mt-2 d-flex justify-content-between align-items-center" style="border-top: 1px solid var(--border);">
+                        <div>
+                            <span class="fw-bold fs-5 text-brand-green">₹{{ final_price }}</span>
+                            <small class="text-brand-muted">/ kg</small>
+                            {% if item['discount_percent'] > 0 %}
+                            <br><small class="text-decoration-line-through text-brand-muted">₹{{ item['price_per_kg'] }} / kg</small>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('product_detail', product_id=item['id']) }}" class="btn btn-outline-brand btn-sm" title="Full Screen Details">
+                                <i class="fas fa-expand-alt"></i>
+                            </a>
+                            {% if item['in_stock'] == 1 %}
+                            <form action="{{ url_for('add_to_cart', product_id=item['id']) }}" method="POST" class="js-cart-form">
+                                <button type="submit" class="btn btn-brand btn-sm px-3">
+                                    <i class="fas fa-cart-plus me-1"></i> Add
+                                </button>
+                            </form>
+                            {% else %}
+                            <button class="btn btn-secondary btn-sm" disabled>Sold Out</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination Controls -->
+    {% if total_pages > 1 %}
+    <nav aria-label="Product pages" class="mt-5">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('products', category=active_category, q=search_query, page=page-1) }}">&laquo; Previous</a>
+            </li>
+            {% for p in range(1, total_pages + 1) %}
+            <li class="page-item {% if p == page %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('products', category=active_category, q=search_query, page=p) }}">{{ p }}</a>
+            </li>
+            {% endfor %}
+            <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('products', category=active_category, q=search_query, page=page+1) }}">Next &raquo;</a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
