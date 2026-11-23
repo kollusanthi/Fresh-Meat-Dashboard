@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Hero Banner -->
+<section class="py-5 text-white" style="background: linear-gradient(125deg, var(--green-dark) 0%, var(--green) 65%, #34664c 100%);">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <span class="badge bg-brand-orange text-white fw-bold px-3 py-2 mb-3">FRESHLY CUT ON ORDER &bull; 90-MIN COLD DELIVERY</span>
+                <h1 class="display-5 fw-bold mb-3">Farm-Fresh, Tender &amp; Hygienic Meat Delivered Cold.</h1>
+                <p class="lead mb-4" style="color: var(--cream);">Antibiotic-free Chicken, Pasture-raised Mutton, and Daily-catch Coastal Fish &amp; Seafood. Tap any cut to view full nutrition &amp; slice details.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{{ url_for('products') }}" class="btn btn-accent btn-lg px-4">Explore All Pages &rarr;</a>
+                    <a href="#offers-section" class="btn btn-outline-light btn-lg fw-bold px-4">Today's Offers</a>
+                </div>
+            </div>
+            <div class="col-lg-5 text-center">
+                <img src="https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&w=700&q=80" alt="Fresh Meat Platter" class="img-fluid rounded-4 shadow-lg" style="border: 3px solid var(--orange);">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Meat Categories -->
+<section class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-0 text-brand-green">Shop by Meat Category</h3>
+            <small class="text-brand-muted">Hand-selected cuts tailored for every recipe</small>
+        </div>
+        <a href="{{ url_for('products') }}" class="btn btn-outline-brand btn-sm">Browse All Pages &rarr;</a>
+    </div>
+
+    <div class="row g-4">
+        {% set cats = [
+            ('Chicken', 'Curry cuts, boneless breasts, wings & lollipops', 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=500&q=80'),
+            ('Mutton', 'Tender goat curry cuts, boneless cubes & keema', 'https://images.unsplash.com/photo-1603048297172-c92544798d5a?auto=format&fit=crop&w=500&q=80'),
+            ('Fish', 'Vanjaram steaks, Rohu, Pomfret & Atlantic Salmon', 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=500&q=80'),
+            ('Seafood', 'Deveined tiger prawns, blue crabs & squid rings', 'https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=500&q=80')
+        ] %}
+        {% for cname, cdesc, cimg in cats %}
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('products', category=cname) }}" class="text-decoration-none" style="color: var(--text);">
+                <div class="card product-card text-center">
+                    <div class="product-img-wrap" style="height: 170px;">
+                        <img src="{{ cimg }}" alt="{{ cname }}">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="fw-bold text-brand-green mb-1">{{ cname }}</h5>
+                        <p class="small text-brand-muted mb-0">{{ cdesc }}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Offers & Discounts Banner -->
+<section id="offers-section" class="container my-5">
+    <div class="p-4 p-md-5 rounded-4 text-white shadow" style="background: linear-gradient(90deg, var(--green-dark) 0%, var(--orange) 100%);">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <span class="badge bg-brand-cream text-brand-green fw-bold mb-2">WEEKEND HARVEST DEAL</span>
+                <h2 class="fw-bold">Flat 15% – 20% OFF on Best-Selling Cuts + Free Delivery Above ₹500!</h2>
+                <p class="mb-0" style="color: var(--cream);">Click any product card to open its full-screen cut &amp; nutrition view.</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="{{ url_for('products') }}" class="btn btn-light text-brand-green fw-bold btn-lg">Grab Deals Now</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section class="container my-5">
+    <h3 class="fw-bold mb-1 text-brand-green">Featured Bestsellers</h3>
+    <p class="text-brand-muted mb-4">Click any item to view full details &amp; suggested pairings</p>
+
+    <div class="row g-4">
+        {% for item in featured %}
+        {% set final_price = get_discounted_price(item) %}
+        <div class="col-sm-6 col-lg-3">
+            <div class="card product-card">
+                <div class="product-img-wrap">
+                    <a href="{{ url_for('product_detail', product_id=item['id']) }}">
+                        <img src="{{ item['image_url'] }}" alt="{{ item['name'] }}" class="{% if item['in_stock'] == 0 %}oos-img{% endif %}">
+                    </a>
+                    {% if item['discount_percent'] > 0 %}
+                    <span class="badge-discount">{{ item['discount_percent'] }}% OFF</span>
+                    {% endif %}
+                    <form action="{{ url_for('toggle_wishlist', product_id=item['id']) }}" method="POST" class="js-wishlist-form">
+                        <button type="submit" class="btn-wishlist" title="Save to Wishlist">
+                            {% if item['id'] in wishlist_ids %}
+                            <i class="fas fa-heart text-brand-orange"></i>
+                            {% else %}
+                            <i class="far fa-heart text-brand-green"></i>
+                            {% endif %}
+                        </button>
+                    </form>
+                    {% if item['in_stock'] == 0 %}
+                    <span class="badge-oos">OUT OF STOCK</span>
+                    {% endif %}
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <span class="badge align-self-start mb-2" style="background: var(--cream); color: var(--green); border: 1px solid var(--border);">{{ item['category'] }}</span>
+                    <h6 class="fw-bold">
+                        <a href="{{ url_for('product_detail', product_id=item['id']) }}" class="text-decoration-none" style="color: var(--text);">
+                            {{ item['name'] }}
+                        </a>
+                    </h6>
+                    <p class="small text-brand-muted flex-grow-1">{{ item['description'][:85] }}...</p>
+                    <div class="d-flex justify-content-between align-items-center mt-2 pt-2" style="border-top: 1px solid var(--border);">
+                        <div>
+                            <span class="fw-bold fs-5 text-brand-green">₹{{ final_price }}</span>
+                            <small class="text-brand-muted">/ kg</small>
+                            {% if item['discount_percent'] > 0 %}
+                            <br><small class="text-decoration-line-through text-brand-muted">₹{{ item['price_per_kg'] }}</small>
+                            {% endif %}
+                        </div>
+                        {% if item['in_stock'] == 1 %}
+                        <form action="{{ url_for('add_to_cart', product_id=item['id']) }}" method="POST" class="js-cart-form">
+                            <button type="submit" class="btn btn-brand btn-sm px-3"><i class="fas fa-cart-plus me-1"></i> Add</button>
+                        </form>
+                        {% else %}
+                        <button class="btn btn-secondary btn-sm" disabled>Sold Out</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="text-center mt-5">
+        <a href="{{ url_for('products', page=1) }}" class="btn btn-accent btn-lg px-5">View Full Multi-Page Catalog &rarr;</a>
+    </div>
+</section>
+
+{% endblock %}
