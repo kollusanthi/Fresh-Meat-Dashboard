@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5" style="max-width: 900px;">
+    <div class="mb-4">
+        <a href="{{ url_for('account') }}" class="text-decoration-none text-brand-green"><i class="fas fa-arrow-left me-2"></i>Back to My Account</a>
+    </div>
+    {% if page == 'notifications' %}
+        <h2 class="fw-bold text-brand-green mb-4"><i class="fas fa-bell text-brand-orange me-2"></i>Notifications</h2>
+        <div class="card-themed p-4">
+            {% if notifications %}
+                {% for n in notifications %}
+                <div class="py-3 border-bottom">
+                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                        <strong class="text-brand-green">Order {{ n['order_code'] }}</strong>
+                        <small class="text-brand-muted">{{ n['order_date'] }}</small>
+                    </div>
+                    <div class="mt-2">Delivery status: <strong>{{ n['delivery_status'] }}</strong></div>
+                    <small class="text-brand-muted">Payment: {{ n['payment_status'] }}</small>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-brand-muted mb-0">You don't have any notifications yet. Order updates will appear here.</p>
+            {% endif %}
+        </div>
+    {% elif page == 'privacy' %}
+        <h2 class="fw-bold text-brand-green mb-4"><i class="fas fa-shield-alt text-brand-orange me-2"></i>Privacy Policy</h2>
+        <div class="card-themed p-4">
+            <h5 class="fw-bold text-brand-green">Information we collect</h5>
+            <p>We store the details you provide, such as your name, mobile number, email address, saved delivery addresses, wishlist and order information, to operate this store.</p>
+            <h5 class="fw-bold text-brand-green mt-4">How we use your information</h5>
+            <p>Your information is used to manage your account, verify your email, process orders, provide delivery updates and respond to support requests.</p>
+            <h5 class="fw-bold text-brand-green mt-4">Data protection</h5>
+            <p>Passwords are stored as secure password hashes. Do not share your password or email verification OTP with anyone.</p>
+            <h5 class="fw-bold text-brand-green mt-4">Contact</h5>
+            <p class="mb-0">For privacy-related questions, contact support@premiumfreshmeat.in.</p>
+        </div>
+    {% else %}
+        <h2 class="fw-bold text-brand-green mb-4"><i class="fas fa-headset text-brand-orange me-2"></i>Help &amp; Support</h2>
+        <div class="card-themed p-4">
+            <h5 class="fw-bold text-brand-green">How can we help?</h5>
+            <p>For order status, open My Account → Notifications or Order History.</p>
+            <p>For delivery or order issues, keep your order ID ready when contacting our support team.</p>
+            <hr>
+            <p><i class="fas fa-phone-alt text-brand-orange me-2"></i>+91 98765 43210</p>
+            <p><i class="fas fa-envelope text-brand-orange me-2"></i>support@premiumfreshmeat.in</p>
+            <p class="mb-0"><i class="fas fa-clock text-brand-orange me-2"></i>Support hours: 7:00 AM – 10:00 PM</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
