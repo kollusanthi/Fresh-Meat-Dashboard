@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreshMeat | Pending Approval</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f4f6fa;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
+
+.card{
+    background:white;
+    width:400px;
+    max-width:90%;
+    padding:40px;
+    border-radius:14px;
+    text-align:center;
+    box-shadow:0 5px 25px rgba(0,0,0,0.08);
+}
+
+.icon{
+    font-size:55px;
+}
+
+h2{
+    color:#263247;
+}
+
+.status{
+    background:#fff3cd;
+    color:#856404;
+    padding:13px;
+    border-radius:7px;
+    font-weight:bold;
+    margin:20px 0;
+}
+
+p{
+    color:#737d8c;
+    line-height:1.6;
+}
+
+a{
+    display:inline-block;
+    margin-top:20px;
+    color:#16a36a;
+    text-decoration:none;
+    font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <div class="icon">⏳</div>
+
+    <h2>Hello, {{ rider.name }}!</h2>
+
+    <div class="status">
+        PENDING ADMIN APPROVAL
+    </div>
+
+    <p>
+        Your registration has been submitted successfully.
+        Our administrator is reviewing your application.
+    </p>
+
+    <p>
+        You will get access to your Rider Dashboard
+        once your account is approved.
+    </p>
+
+    <a href="{{ url_for('logout') }}">Logout</a>
+
+</div>
+
+</body>
+</html>

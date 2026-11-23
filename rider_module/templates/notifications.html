@@ -1,0 +1,266 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>FreshMeat | Notifications</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f4f6fa;
+    color:#263247;
+}
+
+.sidebar{
+    width:260px;
+    background:#172b4d;
+    color:white;
+    position:fixed;
+    inset:0 auto 0 0;
+    height:100vh;
+    padding:27px 18px;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:5px 8px 38px;
+}
+
+.brand-icon{
+    width:46px;
+    height:46px;
+    border-radius:13px;
+    background:#f36b35;
+    display:grid;
+    place-items:center;
+    font-size:25px;
+    font-weight:bold;
+}
+
+.brand-name{font-size:21px;font-weight:700}
+
+.portal{
+    font-size:10px;
+    letter-spacing:2px;
+    color:#bdc9d9;
+    margin-top:4px;
+}
+
+.nav-heading{
+    font-size:10px;
+    letter-spacing:1.8px;
+    color:#93a5bf;
+    margin:24px 10px 10px;
+}
+
+.sidebar a{
+    display:block;
+    padding:14px 13px;
+    color:#dce5f1;
+    text-decoration:none;
+    border-radius:8px;
+    margin:5px 0;
+    font-size:14px;
+}
+
+.sidebar a:hover,.sidebar a.active{
+    background:#f36b35;
+    color:white;
+}
+
+.rider-info{
+    position:absolute;
+    bottom:22px;
+    left:25px;
+    line-height:1.7;
+    color:#dce5f1;
+    font-size:13px;
+}
+
+.main{
+    margin-left:260px;
+    padding:30px 34px;
+}
+
+.topbar{margin-bottom:25px}
+
+.topbar h2{
+    margin:0 0 8px;
+    font-size:26px;
+}
+
+.section{
+    background:white;
+    padding:24px;
+    border-radius:13px;
+    box-shadow:0 3px 14px #172b4d0a;
+}
+
+.section h2{margin:0 0 8px}
+
+.section>p{
+    color:#8490a2;
+    font-size:13px;
+}
+
+.notification{
+    display:flex;
+    gap:16px;
+    padding:20px 5px;
+    border-bottom:1px solid #edf0f4;
+}
+
+.notification:last-child{
+    border-bottom:none;
+}
+
+.notification-icon{
+    width:43px;
+    height:43px;
+    min-width:43px;
+    border-radius:50%;
+    background:#fff0e9;
+    color:#ed713e;
+    display:grid;
+    place-items:center;
+    font-size:20px;
+}
+
+.notification-content{
+    flex:1;
+}
+
+.notification-content strong{
+    font-size:14px;
+}
+
+.notification-content p{
+    color:#687589;
+    font-size:13px;
+    margin:7px 0;
+}
+
+.notification-content small{
+    color:#99a2af;
+    font-size:11px;
+}
+
+.empty{
+    text-align:center;
+    padding:45px 10px;
+    color:#8490a2;
+}
+
+@media(max-width:650px){
+    .sidebar{
+        width:100%;
+        height:auto;
+        position:relative;
+    }
+
+    .rider-info{display:none}
+
+    .main{
+        margin:0;
+        padding:17px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+    <div class="brand">
+        <div class="brand-icon">F</div>
+        <div>
+            <div class="brand-name">FreshMeat</div>
+            <div class="portal">DELIVERY PORTAL</div>
+        </div>
+    </div>
+
+    <div class="nav-heading">WORKSPACE</div>
+
+    <a href="{{ url_for('rider_dashboard') }}">▦ Dashboard</a>
+
+    <a href="{{ url_for('assigned_orders') }}">▤ Assigned Orders</a>
+
+    <a href="{{ url_for('delivery_analytics') }}">▥ Delivery Analytics</a>
+
+    <a href="{{ url_for('rider_profile') }}">♙ My Profile</a>
+
+    <div class="nav-heading">ACCOUNT</div>
+
+    <a href="{{ url_for('order_history') }}">◷ Order History</a>
+
+    <a href="{{ url_for('rider_notifications') }}" class="active">
+        ♧ Notifications
+    </a>
+
+    <div class="rider-info">
+        <strong>{{ rider.name }}</strong><br>
+        <small>Delivery Partner</small><br>
+        <small>● {{ rider.status }}</small>
+    </div>
+
+</aside>
+
+<main class="main">
+
+    <header class="topbar">
+        <h2>Notifications</h2>
+        <p style="color:#8490a2;font-size:13px">
+            Stay updated with your order activities.
+        </p>
+    </header>
+
+    <section class="section">
+
+        <h2>Recent Notifications</h2>
+
+        <p>Updates about your accepted, rejected and delivered orders.</p>
+
+        {% for notification in notifications %}
+
+        <div class="notification">
+
+            <div class="notification-icon">
+                ♧
+            </div>
+
+            <div class="notification-content">
+
+                <strong>{{ notification.title }}</strong>
+
+                <p>{{ notification.message }}</p>
+
+                <small>{{ notification.date }}</small>
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty">
+            <h3>No Notifications Yet</h3>
+            <p>Your order activity notifications will appear here.</p>
+        </div>
+
+        {% endfor %}
+
+    </section>
+
+</main>
+
+</body>
+</html>

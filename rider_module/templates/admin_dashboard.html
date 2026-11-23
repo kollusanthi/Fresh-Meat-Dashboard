@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreshMeat | Admin Portal</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f4f6fa;
+    color:#263247;
+}
+
+.sidebar{
+    position:fixed;
+    inset:0 auto 0 0;
+    width:260px;
+    background:#172b4d;
+    color:white;
+    padding:28px 18px;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:5px 8px 38px;
+}
+
+.brand-icon{
+    width:46px;
+    height:46px;
+    border-radius:13px;
+    background:#f36b35;
+    display:grid;
+    place-items:center;
+    font-size:25px;
+    font-weight:bold;
+}
+
+.brand-name{font-size:21px;font-weight:700}
+
+.brand-sub{
+    font-size:10px;
+    letter-spacing:2px;
+    color:#bdc9d9;
+    margin-top:4px;
+}
+
+.nav-label{
+    font-size:10px;
+    letter-spacing:1.8px;
+    color:#93a5bf;
+    margin:24px 10px 10px;
+}
+
+.sidebar a{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    text-decoration:none;
+    color:#dce5f1;
+    padding:14px 13px;
+    border-radius:8px;
+    margin:5px 0;
+    font-size:14px;
+}
+
+.sidebar a.active,
+.sidebar a:hover{
+    background:#f36b35;
+    color:white;
+}
+
+.sidebar a span{
+    width:20px;
+    text-align:center;
+}
+
+.admin-info{
+    position:absolute;
+    bottom:24px;
+    left:25px;
+    color:#dce5f1;
+    font-size:13px;
+    line-height:1.7;
+}
+
+.main{
+    margin-left:260px;
+    padding:30px 34px;
+}
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:28px;
+    gap:15px;
+}
+
+.topbar h1{
+    font-size:27px;
+    margin:0 0 7px;
+}
+
+.muted{
+    color:#8490a2;
+    font-size:13px;
+}
+
+.online{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    color:#687589;
+    background:white;
+    padding:10px 14px;
+    border-radius:22px;
+}
+
+.dot{
+    width:8px;
+    height:8px;
+    background:#35b879;
+    border-radius:50%;
+}
+
+.avatar{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:#fbe6dc;
+    color:#c45b31;
+    display:grid;
+    place-items:center;
+    font-weight:bold;
+}
+
+.top-actions{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.panel{
+    background:white;
+    border-radius:13px;
+    padding:24px;
+    margin-bottom:22px;
+    box-shadow:0 3px 14px #172b4d0a;
+}
+
+.panel h2,.panel h3{margin:0 0 8px}
+
+.panel-sub{
+    color:#8994a4;
+    font-size:13px;
+    margin:0 0 20px;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:16px;
+    margin:20px 0 24px;
+}
+
+.stat{
+    background:white;
+    border-radius:13px;
+    padding:20px;
+    box-shadow:0 3px 14px #172b4d0a;
+    border:1px solid #edf0f5;
+}
+
+.stat-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    color:#7d899a;
+    font-size:13px;
+}
+
+.stat-icon{
+    width:37px;
+    height:37px;
+    border-radius:10px;
+    background:#fff0e9;
+    color:#ed713e;
+    display:grid;
+    place-items:center;
+    font-size:18px;
+}
+
+.stat h2{
+    font-size:29px;
+    margin:15px 0 4px;
+    color:#263247;
+}
+
+.stat small{color:#8a95a5}
+
+.table-wrap{overflow-x:auto}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:760px;
+}
+
+th,td{
+    text-align:left;
+    padding:15px 12px;
+    border-bottom:1px solid #edf0f4;
+    font-size:13px;
+}
+
+th{
+    background:#f8f9fb;
+    color:#718096;
+    font-weight:600;
+}
+
+.status{
+    display:inline-block;
+    padding:6px 11px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:700;
+}
+
+.pending{background:#fff2d8;color:#a66b00}
+.accepted{background:#e4efff;color:#2467a8}
+.delivered{background:#def5e6;color:#18783e}
+.rejected{background:#ffe5e5;color:#c43b3b}
+
+.info-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
+}
+
+.info-item{
+    padding:13px;
+    background:#f8f9fb;
+    border-radius:8px;
+    font-size:13px;
+}
+
+.info-item strong{
+    display:block;
+    margin-bottom:5px;
+    color:#8290a2;
+    font-size:11px;
+    font-weight:500;
+}
+
+@media(max-width:1000px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+}
+
+@media(max-width:700px){
+    .sidebar{
+        position:relative;
+        width:100%;
+        height:auto;
+    }
+    .admin-info{display:none}
+    .main{margin:0;padding:20px}
+    .topbar{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+    .stats{grid-template-columns:1fr 1fr}
+}
+
+@media(max-width:430px){
+    .stats,.info-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+    <div class="brand">
+        <div class="brand-icon">F</div>
+        <div>
+            <div class="brand-name">FreshMeat</div>
+            <div class="brand-sub">ADMIN PORTAL</div>
+        </div>
+    </div>
+
+    <div class="nav-label">WORKSPACE</div>
+
+    <a class="active" href="#dashboard">
+        <span>▦</span>Dashboard
+    </a>
+
+    <a href="#orders">
+        <span>▤</span>Order Management
+    </a>
+
+    <a href="#rider">
+        <span>♙</span>Rider Details
+    </a>
+
+    <div class="admin-info">
+        <strong>FreshMeat Admin</strong><br>
+        <small>Administrator</small>
+    </div>
+
+</aside>
+
+<main class="main">
+
+    <header class="topbar" id="dashboard">
+
+        <div>
+            <h1>Dashboard Overview</h1>
+            <div class="muted">
+                Monitor and manage your FreshMeat marketplace.
+            </div>
+        </div>
+
+        <div class="top-actions">
+            <div class="online">
+                <span class="dot"></span>
+                System Online
+            </div>
+            <div class="avatar">A</div>
+        </div>
+
+    </header>
+
+    <section>
+
+        <h2 style="font-size:18px;margin:0 0 14px">
+            Business Overview
+        </h2>
+
+        <p class="muted" style="margin:0 0 18px">
+            Here's what's happening with your marketplace.
+        </p>
+
+        <div class="stats">
+
+            <div class="stat">
+                <div class="stat-top">
+                    Total Orders
+                    <span class="stat-icon">▤</span>
+                </div>
+                <h2>{{ orders|length }}</h2>
+                <small>Orders in the system</small>
+            </div>
+
+            <div class="stat">
+                <div class="stat-top">
+                    Pending Orders
+                    <span class="stat-icon">◷</span>
+                </div>
+                <h2>{{ orders|selectattr('rider_status','equalto','Pending')|list|length }}</h2>
+                <small>Awaiting rider action</small>
+            </div>
+
+            <div class="stat">
+                <div class="stat-top">
+                    Delivered Orders
+                    <span class="stat-icon">✓</span>
+                </div>
+                <h2>{{ orders|selectattr('rider_status','equalto','Delivered')|list|length }}</h2>
+                <small>Successfully completed</small>
+            </div>
+
+            <div class="stat">
+                <div class="stat-top">
+                    Rejected Orders
+                    <span class="stat-icon">⊘</span>
+                </div>
+                <h2>{{ orders|selectattr('rider_status','equalto','Rejected')|list|length }}</h2>
+                <small>Rejected by rider</small>
+            </div>
+
+        </div>
+
+    </section>
+
+    <section class="panel" id="orders">
+
+        <h2>Order Management</h2>
+
+        <p class="panel-sub">
+            Track seller and rider order statuses.
+        </p>
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Food</th>
+                        <th>Amount</th>
+                        <th>Seller Status</th>
+                        <th>Rider Status</th>
+                        <th>Rejection Reason</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for order in orders %}
+
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>{{ order.customer }}</td>
+                        <td>{{ order.item }}</td>
+                        <td>₹{{ order.amount }}</td>
+                        <td>{{ order.seller_status }}</td>
+
+                        <td>
+                            <span class="status {{ order.rider_status|lower }}">
+                                {{ order.rider_status }}
+                            </span>
+                        </td>
+
+                        <td>{{ order.rejection_reason or "-" }}</td>
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+                        <td colspan="7" style="text-align:center;color:#8994a4">
+                            No orders available.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+    <section class="panel" id="rider">
+
+        <h2>Rider Information</h2>
+
+        <p class="panel-sub">
+            Registered delivery partner details.
+        </p>
+
+        <div class="info-grid">
+
+            <div class="info-item">
+                <strong>RIDER NAME</strong>
+                {{ rider.name }}
+            </div>
+
+            <div class="info-item">
+                <strong>RIDER ID</strong>
+                {{ rider.id }}
+            </div>
+
+            <div class="info-item">
+                <strong>PHONE</strong>
+                {{ rider.phone }}
+            </div>
+
+            <div class="info-item">
+                <strong>ACCOUNT STATUS</strong>
+                <span class="status accepted">{{ rider.status }}</span>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+</html>

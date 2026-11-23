@@ -1,0 +1,437 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>FreshMeat | Rider Verification</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 30px 15px;
+    font-family: Arial, sans-serif;
+    background: #f4f6fa;
+    color: #192f52;
+}
+
+.container {
+    max-width: 850px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 5px 25px rgba(25,47,82,.08);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.logo {
+    background: #f66b35;
+    color: white;
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-size: 27px;
+    font-weight: bold;
+}
+
+.brand h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.brand span {
+    font-size: 10px;
+    color: #64748b;
+    letter-spacing: 1.5px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.description {
+    text-align: center;
+    color: #718096;
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: bold;
+    border-left: 4px solid #f66b35;
+    padding-left: 10px;
+    margin: 28px 0 15px;
+}
+
+.camera-box {
+    background: #192f52;
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+}
+
+video {
+    width: 100%;
+    max-height: 350px;
+    object-fit: cover;
+    background: #101c30;
+    border-radius: 8px;
+}
+
+select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #dce1e8;
+    border-radius: 7px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+button {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 7px;
+    background: #f66b35;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #e85b27;
+}
+
+.secondary {
+    background: #64748b;
+}
+
+.capture-button {
+    width: 100%;
+    margin-top: 15px;
+}
+
+.preview-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.preview-card {
+    border: 1px solid #e1e6ee;
+    border-radius: 9px;
+    padding: 13px;
+}
+
+.preview-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: contain;
+    background: #f4f6fa;
+    border-radius: 7px;
+}
+
+.preview-card h4 {
+    font-size: 13px;
+    margin: 8px 0;
+}
+
+.status {
+    font-size: 12px;
+    color: #d97706;
+}
+
+.status.done {
+    color: #15945c;
+}
+
+.submit-button {
+    width: 100%;
+    margin-top: 30px;
+    padding: 15px;
+    font-size: 16px;
+}
+
+.message {
+    background: #ffe8e8;
+    color: #c62828;
+    padding: 12px;
+    border-radius: 7px;
+    margin-bottom: 15px;
+}
+
+@media(max-width: 550px) {
+    .container {
+        padding: 20px;
+    }
+
+    .preview-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="brand">
+        <div class="logo">F</div>
+        <div>
+            <h1>FreshMeat</h1>
+            <span>DELIVERY PORTAL</span>
+        </div>
+    </div>
+
+    <h2>Rider Verification</h2>
+
+    <p class="description">
+        Capture your photograph and vehicle documents
+        to complete your rider verification.
+    </p>
+
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    <form method="POST"
+          action="{{ url_for('rider_verification') }}"
+          enctype="multipart/form-data"
+          id="verificationForm">
+
+        <div class="section-title">Live Camera</div>
+
+        <div class="camera-box">
+
+            <select id="documentType">
+                <option value="rider_photo">Rider Photograph</option>
+                <option value="license_front">Driving Licence - Front</option>
+                <option value="license_back">Driving Licence - Back</option>
+                <option value="rc_front">Vehicle RC - Front</option>
+                <option value="rc_back">Vehicle RC - Back</option>
+                <option value="vehicle_photo">Vehicle Photograph</option>
+            </select>
+
+            <video id="camera" autoplay playsinline></video>
+
+            <canvas id="canvas" hidden></canvas>
+
+            <button type="button" id="startCamera">
+                Start Camera
+            </button>
+
+            <button type="button" class="capture-button"
+                    id="capturePhoto">
+                Capture Photo
+            </button>
+
+            <p style="color:white;font-size:12px;">
+                Select a document, capture its photograph,
+                and check the preview below.
+            </p>
+
+        </div>
+
+        <div class="section-title">Captured Photographs</div>
+
+        <div class="preview-grid">
+
+            <div class="preview-card">
+                <h4>Rider Photograph</h4>
+                <img id="preview_rider_photo" alt="Rider photo preview">
+                <p class="status" id="status_rider_photo">Not captured</p>
+                <input type="file" name="rider_photo" id="rider_photo" hidden>
+            </div>
+
+            <div class="preview-card">
+                <h4>Driving Licence - Front</h4>
+                <img id="preview_license_front" alt="Licence front preview">
+                <p class="status" id="status_license_front">Not captured</p>
+                <input type="file" name="license_front" id="license_front" hidden>
+            </div>
+
+            <div class="preview-card">
+                <h4>Driving Licence - Back</h4>
+                <img id="preview_license_back" alt="Licence back preview">
+                <p class="status" id="status_license_back">Not captured</p>
+                <input type="file" name="license_back" id="license_back" hidden>
+            </div>
+
+            <div class="preview-card">
+                <h4>Vehicle RC - Front</h4>
+                <img id="preview_rc_front" alt="RC front preview">
+                <p class="status" id="status_rc_front">Not captured</p>
+                <input type="file" name="rc_front" id="rc_front" hidden>
+            </div>
+
+            <div class="preview-card">
+                <h4>Vehicle RC - Back</h4>
+                <img id="preview_rc_back" alt="RC back preview">
+                <p class="status" id="status_rc_back">Not captured</p>
+                <input type="file" name="rc_back" id="rc_back" hidden>
+            </div>
+
+            <div class="preview-card">
+                <h4>Vehicle Photograph</h4>
+                <img id="preview_vehicle_photo" alt="Vehicle photo preview">
+                <p class="status" id="status_vehicle_photo">Not captured</p>
+                <input type="file" name="vehicle_photo" id="vehicle_photo" hidden>
+            </div>
+
+        </div>
+
+        <button type="submit" class="submit-button">
+            Submit Documents
+        </button>
+
+    </form>
+
+</div>
+
+<script>
+const camera = document.getElementById("camera");
+const canvas = document.getElementById("canvas");
+const selector = document.getElementById("documentType");
+
+let stream = null;
+
+async function startCamera() {
+
+    try {
+
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+
+        const facingMode =
+            selector.value === "rider_photo" ? "user" : "environment";
+
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: { ideal: facingMode }
+            },
+            audio: false
+        });
+
+        camera.srcObject = stream;
+        await camera.play();
+
+    } catch (error) {
+
+        alert("Camera access failed. Please allow camera permission and try again.");
+
+    }
+}
+
+document.getElementById("startCamera").addEventListener("click", startCamera);
+
+document.getElementById("capturePhoto").addEventListener("click", function() {
+
+    if (!stream || !camera.videoWidth) {
+        alert("Please start the camera first.");
+        return;
+    }
+
+    const type = selector.value;
+
+    canvas.width = camera.videoWidth;
+    canvas.height = camera.videoHeight;
+
+    const context = canvas.getContext("2d");
+
+    context.drawImage(camera, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob(function(blob) {
+
+        if (!blob) {
+            alert("Could not capture image. Please try again.");
+            return;
+        }
+
+        const file = new File(
+            [blob],
+            type + ".jpg",
+            { type: "image/jpeg" }
+        );
+
+        const input = document.getElementById(type);
+
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        input.files = dataTransfer.files;
+
+        const preview = document.getElementById("preview_" + type);
+
+        if (preview.dataset.url) {
+            URL.revokeObjectURL(preview.dataset.url);
+        }
+
+        const previewUrl = URL.createObjectURL(blob);
+
+        preview.src = previewUrl;
+        preview.dataset.url = previewUrl;
+
+        const status = document.getElementById("status_" + type);
+
+        status.textContent = "Captured successfully";
+        status.classList.add("done");
+
+    }, "image/jpeg", 0.85);
+
+});
+
+document.getElementById("verificationForm").addEventListener("submit", function(event) {
+
+    const fields = [
+        "rider_photo",
+        "license_front",
+        "license_back",
+        "rc_front",
+        "rc_back",
+        "vehicle_photo"
+    ];
+
+    for (const field of fields) {
+
+        if (!document.getElementById(field).files.length) {
+
+            event.preventDefault();
+
+            alert("Please capture all six required photographs.");
+
+            return;
+        }
+    }
+
+});
+
+window.addEventListener("beforeunload", function() {
+
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+    }
+
+});
+</script>
+
+</body>
+</html>

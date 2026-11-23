@@ -1,0 +1,26 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FreshMeat | Application Rejected</title>
+</head>
+
+<body style="font-family:Arial;text-align:center;background:#f4f6fa;padding:80px;">
+
+<div style="background:white;padding:40px;border-radius:12px;max-width:400px;margin:auto;">
+
+    <h1 style="color:#dc3545;">Application Rejected</h1>
+
+    <h3>Hello, {{ rider.name }}!</h3>
+
+    <p>Your rider registration application was rejected by the administrator.</p>
+
+    <p>Please contact the administrator for further information.</p>
+
+    <a href="{{ url_for('logout') }}">Logout</a>
+
+</div>
+
+</body>
+</html>
