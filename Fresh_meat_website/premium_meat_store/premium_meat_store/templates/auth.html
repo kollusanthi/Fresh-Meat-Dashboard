@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+            <div class="card-themed overflow-hidden shadow-lg">
+                <div class="bg-brand-green text-white text-center py-4">
+                    <img src="{{ url_for('static', filename='logo.png', v='2') }}" alt="Logo" class="brand-logo mb-2">
+                    <h4 class="fw-bold mb-0">
+                        {% if mode == 'choose_role' %}
+                            Select Your Role
+                        {% elif mode == 'register' %}
+                            {% if role == 'rider' %}Rider Registration
+                            {% elif role == 'seller' %}Seller Registration
+                            {% else %}Customer Registration{% endif %}
+                        {% elif mode == 'forgot' %}
+                            Forgot Password
+                        {% elif mode == 'reset' %}
+                            Reset Your Password
+                        {% else %}
+                            {% if role == 'rider' %}Rider Login
+                            {% elif role == 'seller' %}Seller Login
+                            {% else %}Customer Login{% endif %}
+                        {% endif %}
+                    </h4>
+                </div>
+
+                <div class="card-body p-4">
+                    {% if mode == 'choose_role' %}
+                    <p class="text-center text-brand-muted small mb-4">Choose how you would like to continue to Premium Fresh Meat:</p>
+                    <div class="d-grid gap-3">
+                        <a href="{{ url_for('auth', mode='login', role='customer') }}" class="btn btn-outline-success py-3 text-start d-flex align-items-center justify-content-between rounded-3 shadow-sm">
+                            <div>
+                                <div class="fw-bold fs-5"><i class="fas fa-shopping-bag me-2"></i>Customer</div>
+                                <small class="text-muted">Order fresh meat &amp; track your deliveries</small>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        <a href="{{ url_for('auth', mode='login', role='rider') }}" class="btn btn-outline-warning py-3 text-start d-flex align-items-center justify-content-between rounded-3 shadow-sm text-dark">
+                            <div>
+                                <div class="fw-bold fs-5"><i class="fas fa-motorcycle me-2"></i>Rider</div>
+                                <small class="text-muted">Deliver orders &amp; manage delivery trips</small>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                        <a href="{{ url_for('auth', mode='login', role='seller') }}" class="btn btn-outline-danger py-3 text-start d-flex align-items-center justify-content-between rounded-3 shadow-sm">
+                            <div>
+                                <div class="fw-bold fs-5"><i class="fas fa-store me-2"></i>Seller</div>
+                                <small class="text-muted">List meat products &amp; manage your store</small>
+                            </div>
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+
+                    {% elif mode == 'login' %}
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill text-uppercase">
+                            {{ role|capitalize }} Portal
+                        </span>
+                        <a href="{{ url_for('auth', mode='choose_role') }}" class="small text-brand-orange text-decoration-none fw-semibold">
+                            <i class="fas fa-exchange-alt me-1"></i>Switch Role
+                        </a>
+                    </div>
+                    <form method="POST">
+                        <input type="hidden" name="action" value="login">
+                        <input type="hidden" name="role" value="{{ role }}">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Email Address or Mobile Number</label>
+                            <input type="text" name="identifier" class="form-control" placeholder="Enter email or 10-digit mobile" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Password</label>
+                            <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+                        </div>
+                        <div class="d-flex justify-content-end mb-3">
+                            <a href="{{ url_for('auth', mode='forgot', role=role) }}" class="small text-brand-orange text-decoration-none fw-semibold">Forgot Password?</a>
+                        </div>
+                        <button type="submit" class="btn btn-brand w-100 py-2">Login as {{ role|capitalize }}</button>
+                    </form>
+                    <hr>
+                    <p class="text-center small mb-0">
+                        New {{ role|capitalize }}?
+                        <a href="{{ url_for('auth', mode='register', role=role) }}" class="text-brand-orange fw-bold">Register Here</a>
+                    </p>
+
+                    {% elif mode == 'register' %}
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill text-uppercase">
+                            {{ role|capitalize }} Registration
+                        </span>
+                        <a href="{{ url_for('auth', mode='choose_role') }}" class="small text-brand-orange text-decoration-none fw-semibold">
+                            <i class="fas fa-exchange-alt me-1"></i>Switch Role
+                        </a>
+                    </div>
+                    <form method="POST">
+                        <input type="hidden" name="action" value="register">
+                        <input type="hidden" name="role" value="{{ role }}">
+
+                        {% if role == 'seller' %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Seller Full Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="e.g. Rajesh Kumar" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Shop / Store Name</label>
+                            <input type="text" name="shop_name" class="form-control" placeholder="e.g. Fresh Cuts Meat Shop" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Mobile Number</label>
+                            <input type="tel" name="mobile" class="form-control" placeholder="e.g. 9876543210" pattern="[0-9]{10}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Email Address</label>
+                            <input type="email" name="email" class="form-control" placeholder="shop@example.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Shop Address / City</label>
+                            <input type="text" name="area" class="form-control" placeholder="e.g. Madhuravada, Visakhapatnam" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">FSSAI / Business License Number</label>
+                            <input type="text" name="license_number" class="form-control" placeholder="Enter license number" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Create Password</label>
+                            <input type="password" name="password" class="form-control" minlength="6" placeholder="Minimum 6 characters" required>
+                        </div>
+
+                        {% elif role == 'rider' %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Rider Full Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="e.g. Suresh Reddy" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Mobile Number</label>
+                            <input type="tel" name="mobile" class="form-control" placeholder="e.g. 9876543210" pattern="[0-9]{10}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Email Address</label>
+                            <input type="email" name="email" class="form-control" placeholder="rider@example.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Vehicle Type</label>
+                            <select name="vehicle_type" class="form-select" required>
+                                <option value="" selected disabled>Select vehicle type</option>
+                                <option value="Bike">Bike</option>
+                                <option value="Scooter">Scooter</option>
+                                <option value="Cycle">Cycle</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Vehicle Number</label>
+                            <input type="text" name="vehicle_number" class="form-control" placeholder="e.g. AP31AB1234" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Delivery Area / City</label>
+                            <input type="text" name="area" class="form-control" placeholder="e.g. Madhuravada" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Create Password</label>
+                            <input type="password" name="password" class="form-control" minlength="6" placeholder="Minimum 6 characters" required>
+                        </div>
+
+                        {% else %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Customer Full Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="e.g. Rahul Sharma" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Mobile Number</label>
+                            <input type="tel" name="mobile" class="form-control" placeholder="e.g. 9876543210" pattern="[0-9]{10}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Email Address</label>
+                            <input type="email" name="email" class="form-control" placeholder="rahul@example.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Create Password</label>
+                            <input type="password" name="password" class="form-control" minlength="6" placeholder="Minimum 6 characters" required>
+                        </div>
+                        {% endif %}
+
+                        <button type="submit" class="btn btn-brand w-100 py-2">Submit</button>
+                    </form>
+                    <hr>
+                    <p class="text-center small mb-0">
+                        Already have an account?
+                        <a href="{{ url_for('auth', mode='login', role=role) }}" class="text-brand-orange fw-bold">Login</a>
+                    </p>
+
+                    {% elif mode == 'forgot' %}
+                    <form method="POST">
+                        <input type="hidden" name="action" value="forgot_send_otp">
+                        <input type="hidden" name="role" value="{{ role or 'customer' }}">
+                        <p class="text-brand-muted small">Enter your registered mobile number to receive a password reset OTP.</p>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Registered Mobile Number</label>
+                            <input type="tel" name="mobile" class="form-control" placeholder="10-digit mobile number" required>
+                        </div>
+                        <button type="submit" class="btn btn-brand w-100 py-2">Send Reset OTP</button>
+                    </form>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('auth', mode='login', role=role or 'customer') }}" class="small text-brand-muted">Back to Login</a>
+                    </div>
+
+                    {% elif mode == 'reset' %}
+                    <form method="POST">
+                        <input type="hidden" name="action" value="reset_password">
+                        <input type="hidden" name="role" value="{{ role or 'customer' }}">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Enter 4-Digit OTP</label>
+                            <input type="text" name="otp" class="form-control" maxlength="4" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">New Password</label>
+                            <input type="password" name="new_password" class="form-control" minlength="6" required>
+                        </div>
+                        <button type="submit" class="btn btn-brand w-100 py-2">Update Password</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
