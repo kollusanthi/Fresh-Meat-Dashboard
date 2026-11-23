@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} | FreshMeet Admin</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f7f7f8;
+            color: #292929;
+        }
+
+        header {
+            background: #b71c1c;
+            color: white;
+            padding: 22px 35px;
+        }
+
+        header h2 { margin: 0 0 10px; }
+
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        main { padding: 30px; }
+
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        input, select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        button, .view-btn {
+            background: #b71c1c;
+            color: white;
+            border: none;
+            padding: 11px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .table-box {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+        th {
+            color: #8e1515;
+            background: #fff3f3;
+        }
+
+        .status {
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .Pending { background: #fff0d5; color: #a56800; }
+        .Approved { background: #e0f5e8; color: #18753b; }
+        .Rejected { background: #ffe1e1; color: #b71c1c; }
+        .Blocked { background: #eee; color: #444; }
+
+        @media(max-width:600px) {
+            main { padding: 15px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>FreshMeet Admin | {{ title }}</h2>
+    <a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+</header>
+
+<main>
+    <h2>{{ title }} Management</h2>
+
+    <p>Total Records: <strong>{{ rows|length }}</strong></p>
+
+    <form class="toolbar" method="GET">
+
+        <input type="text"
+               name="search"
+               value="{{ search }}"
+               placeholder="Search name, email or phone">
+
+        <select name="status">
+            {% for item in ['All','Pending','Approved','Rejected','Blocked'] %}
+            <option value="{{ item }}"
+                {% if selected_status == item %}selected{% endif %}>
+                {{ item }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Search / Filter</button>
+    </form>
+
+    <div class="table-box">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for person in rows %}
+                <tr>
+                    <td>{{ person['id'] }}</td>
+                    <td><strong>{{ person['name'] }}</strong></td>
+                    <td>{{ person['email'] or '-' }}</td>
+                    <td>{{ person['phone'] or '-' }}</td>
+
+                    <td>
+                        <span class="status {{ person['status'] }}">
+                            {{ person['status'] }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <a class="view-btn"
+                           href="{{ url_for('person_details', module=module, record_id=person['id']) }}">
+                            View Details
+                        </a>
+                    </td>
+                </tr>
+
+                {% else %}
+                <tr>
+                    <td colspan="6">No records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</main>
+
+</body>
+</html>
