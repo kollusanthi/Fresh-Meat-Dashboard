@@ -1,0 +1,237 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Details | FreshMeet Admin</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 30px;
+            font-family: Arial, sans-serif;
+            background: #f5f6fa;
+            color: #292d32;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: auto;
+        }
+
+        .back {
+            color: #e53945;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        h1 { margin-bottom: 5px; }
+
+        .subtitle {
+            color: #777;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+        }
+
+        .card h2 {
+            font-size: 19px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 12px;
+        }
+
+        .details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 22px;
+        }
+
+        .item label {
+            display: block;
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .item strong {
+            font-size: 15px;
+        }
+
+        .amount {
+            color: #e53945;
+            font-size: 25px !important;
+        }
+
+        .status {
+            display: inline-block;
+            background: #fff3cd;
+            color: #856404;
+            padding: 7px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        .update-form select {
+            padding: 11px 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            min-width: 180px;
+            background: white;
+            margin-right: 10px;
+        }
+
+        .update-btn {
+            background: #287a49;
+            color: white;
+            padding: 11px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .update-btn:hover {
+            background: #20623b;
+        }
+
+        @media(max-width: 600px) {
+            body { padding: 15px; }
+            .details { grid-template-columns: 1fr; }
+
+            .update-form select {
+                width: 100%;
+                margin-bottom: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <a class="back" href="{{ url_for('manage_records', module='payments') }}">
+        ← Back to Payments
+    </a>
+
+    <h1>Payment Details</h1>
+    <p class="subtitle">FreshMeet Admin | Complete payment information</p>
+
+    <!-- PAYMENT INFORMATION -->
+    <div class="card">
+        <h2>Payment Information</h2>
+
+        <div class="details">
+            <div class="item">
+                <label>Payment ID</label>
+                <strong>#{{ payment['id'] }}</strong>
+            </div>
+
+            <div class="item">
+                <label>Order ID</label>
+                <strong>#{{ payment['order_id'] }}</strong>
+            </div>
+
+            <div class="item">
+                <label>Payment Amount</label>
+                <strong class="amount">₹{{ payment['amount'] }}</strong>
+            </div>
+
+            <div class="item">
+                <label>Payment Status</label>
+                <strong class="status">{{ payment['payment_status'] }}</strong>
+            </div>
+
+            <div class="item">
+                <label>Payment Date</label>
+                <strong>{{ payment['created_at'] }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- UPDATE PAYMENT STATUS -->
+    <div class="card">
+        <h2>Update Payment Status</h2>
+
+        <form method="POST"
+              class="update-form"
+              action="{{ url_for('manage_records', module='payments') }}"
+              onsubmit="return confirm('Are you sure you want to update this payment status?');">
+
+            <input type="hidden"
+                   name="record_id"
+                   value="{{ payment['id'] }}">
+
+            <label>Select New Payment Status</label>
+
+            <select name="new_status" required>
+                <option value="Pending"
+                    {% if payment['payment_status'] == 'Pending' %}selected{% endif %}>
+                    Pending
+                </option>
+
+                <option value="Completed"
+                    {% if payment['payment_status'] == 'Completed' %}selected{% endif %}>
+                    Completed
+                </option>
+
+                <option value="Failed"
+                    {% if payment['payment_status'] == 'Failed' %}selected{% endif %}>
+                    Failed
+                </option>
+            </select>
+
+            <button type="submit"
+                    name="action"
+                    value="update"
+                    class="update-btn">
+                Update Payment Status
+            </button>
+
+        </form>
+    </div>
+
+    <!-- RELATED ORDER INFORMATION -->
+    <div class="card">
+        <h2>Related Order Information</h2>
+
+        {% if order %}
+        <div class="details">
+            <div class="item">
+                <label>Order ID</label>
+                <strong>#{{ order['id'] }}</strong>
+            </div>
+
+            <div class="item">
+                <label>Customer ID</label>
+                <strong>#{{ order['customer_id'] }}</strong>
+            </div>
+
+            <div class="item">
+                <label>Order Amount</label>
+                <strong>₹{{ order['total_amount'] }}</strong>
+            </div>
+
+            <div class="item">
+                <label>Order Status</label>
+                <strong>{{ order['status'] }}</strong>
+            </div>
+        </div>
+        {% else %}
+        <p>Related order information is not available.</p>
+        {% endif %}
+    </div>
+
+</div>
+</body>
+</html>
