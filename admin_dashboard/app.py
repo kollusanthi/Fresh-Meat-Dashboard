@@ -17,9 +17,9 @@ from database import get_db_connection, init_db
 
 
 app = Flask(__name__)
-app.secret_key = "freshmeet_admin_secret_key"
+app.secret_key = os.environ.get("SECRET_KEY", "local-development-only-secret")
 
-app.config["UPLOAD_FOLDER"] = os.path.join(app.root_path, "uploads")
+app.config["UPLOAD_FOLDER"] = os.environ.get("UPLOAD_FOLDER", os.path.join(app.root_path, "uploads"))
 app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
 
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
